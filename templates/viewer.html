@@ -2,15 +2,40 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>PP3DC Viewer</title>
+    <title>PP3DC Tester</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" href="/static/styles.css" />
   </head>
-  <body class="viewer-body">
-    <div id="viewer">
-      <img id="image" alt="" />
-      <div id="image-name"></div>
-    </div>
+  <body class="page">
+    <header class="topbar">
+      <div class="brand-name">PP3DC Tester</div>
+    </header>
+
+    <main class="viewer">
+      <div class="image-frame">
+        <img id="image" alt="" />
+      </div>
+      <div id="image-name" class="image-name">Waiting for images...</div>
+    </main>
+
+    <aside id="controls" class="controls" aria-hidden="true">
+      <button id="controls-toggle" class="controls-toggle" aria-expanded="false">
+        ◀
+      </button>
+      <div class="controls-body">
+        <h2>Playback controls</h2>
+        <div class="control-row">
+          <label for="delay-input">Delay (seconds)</label>
+          <input id="delay-input" type="number" min="0.25" step="0.25" value="3" />
+        </div>
+        <div class="button-row">
+          <button id="start">Start</button>
+          <button id="stop" class="secondary">Stop</button>
+          <button id="reset" class="secondary">Reset</button>
+        </div>
+        <div id="status" class="status">Loading configuration...</div>
+      </div>
+    </aside>
 
     <script src="/static/viewer.js"></script>
   </body>

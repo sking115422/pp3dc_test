@@ -1,6 +1,6 @@
 # PP3DC Local App
 
-This is a local Flask app that rotates through images on localhost:8080 using settings from `config.json`.
+This is a local Flask app that rotates through images on localhost:8080 using a folder path from `config.json`.
 
 ## Configure
 
@@ -13,7 +13,7 @@ Edit `config.json`:
 }
 ```
 
-Changes are picked up automatically.
+Changes are picked up automatically. The delay can also be adjusted in the web UI.
 
 ## Run
 
@@ -37,4 +37,5 @@ python app.py
 
 ## Notes
 
+- The viewer includes Start/Stop and delay controls alongside the slideshow.
 - The viewer updates its URL with the current image name for tracking.

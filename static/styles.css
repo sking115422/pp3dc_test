@@ -1,11 +1,10 @@
 :root {
   --bg: #0f1116;
   --panel: #161a22;
-  --panel-2: #1f2531;
+  --panel-2: #1d2433;
   --text: #e6e9ef;
   --muted: #9aa3b2;
   --accent: #4aa3ff;
-  --accent-strong: #2d7cd6;
   --border: #2a3242;
 }
 
@@ -15,40 +14,113 @@
 
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
-  background: var(--bg);
+  font-family: "Georgia", "Times New Roman", serif;
+  background:
+    radial-gradient(circle at top, rgba(66, 84, 118, 0.25), transparent 55%),
+    linear-gradient(180deg, #0b0d12 0%, var(--bg) 100%);
   color: var(--text);
 }
 
-.control-body {
+.page {
   min-height: 100vh;
+}
+
+.topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  background: rgba(12, 14, 19, 0.65);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(10px);
+  z-index: 20;
+}
+
+.brand-name {
+  font-size: 18px;
+  letter-spacing: 0.6px;
+  font-weight: 600;
+}
+
+.viewer {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
   display: grid;
   place-items: center;
-  padding: 24px;
+  padding: 0;
 }
 
-.panel {
-  width: min(520px, 95vw);
+.image-frame {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+}
+
+.image-frame img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.image-name {
+  position: absolute;
+  left: 22px;
+  bottom: 20px;
+  padding: 6px 12px;
+  background: rgba(12, 14, 19, 0.7);
+  border: 1px solid rgba(42, 50, 66, 0.7);
+  border-radius: 10px;
+  font-size: 12px;
+}
+
+.controls {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100vh;
+  width: 25vw;
+  max-width: 90vw;
   background: var(--panel);
+  border-left: 1px solid var(--border);
+  box-shadow: -12px 0 24px rgba(0, 0, 0, 0.25);
+  transform: translateX(100%);
+  transition: transform 0.25s ease;
+  z-index: 30;
+}
+
+.controls.open {
+  transform: translateX(0);
+}
+
+.controls-toggle {
+  position: absolute;
+  left: -36px;
+  top: 120px;
+  width: 36px;
+  height: 56px;
+  border-radius: 12px 0 0 12px;
   border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+  border-right: none;
+  background: var(--panel-2);
+  color: var(--text);
+  cursor: pointer;
 }
 
-.panel h1 {
-  margin: 0 0 16px;
-  font-size: 20px;
+.controls-body {
+  padding: 20px 32px 20px 20px;
+  display: grid;
+  gap: 16px;
 }
 
-.control-group {
-  margin-bottom: 16px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid var(--border);
-}
-
-.control-group:last-child {
-  border-bottom: none;
+.controls-body h2 {
+  margin: 0;
+  font-size: 18px;
 }
 
 label {
@@ -58,25 +130,32 @@ label {
   margin-bottom: 6px;
 }
 
-input[type="text"],
 input[type="number"] {
   width: 100%;
-  padding: 8px 10px;
+  padding: 10px 12px;
   background: var(--panel-2);
   border: 1px solid var(--border);
+  border-radius: 10px;
   color: var(--text);
-  border-radius: 8px;
+  font-family: inherit;
+}
+
+.button-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
 button {
-  padding: 10px 12px;
-  cursor: pointer;
-  background: var(--accent);
-  border: none;
-  color: #0b0d12;
-  font-weight: 700;
-  border-radius: 8px;
   width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: none;
+  background: var(--accent);
+  color: #0b0d12;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
 }
 
 button.secondary {
@@ -86,61 +165,21 @@ button.secondary {
 }
 
 button:disabled {
-  opacity: 0.5;
+  opacity: 0.6;
   cursor: not-allowed;
-}
-
-.button-row {
-  display: flex;
-  gap: 8px;
-}
-
-.button-row button {
-  flex: 1;
 }
 
 .status {
   font-size: 12px;
   color: var(--muted);
-  margin-top: 8px;
-  line-height: 1.5;
 }
 
-.viewer-body {
-  min-height: 100vh;
-  display: grid;
-  place-items: center;
-  overflow: hidden;
-}
+@media (max-width: 720px) {
+  .controls {
+    width: 240px;
+  }
 
-#viewer {
-  width: 100vw;
-  height: 100vh;
-  display: grid;
-  place-items: center;
-  position: relative;
-}
-
-#viewer img {
-  max-width: 100vw;
-  max-height: 100vh;
-  object-fit: contain;
-}
-
-#image-name {
-  position: absolute;
-  left: 18px;
-  bottom: 18px;
-  background: rgba(15, 17, 22, 0.7);
-  border: 1px solid rgba(42, 50, 66, 0.8);
-  padding: 6px 10px;
-  border-radius: 8px;
-  font-size: 12px;
-  color: var(--text);
-}
-
-.note {
-  font-size: 11px;
-  color: var(--muted);
-  margin-top: 6px;
+  .controls-toggle {
+    top: 90px;
+  }
 }

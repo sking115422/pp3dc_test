@@ -6,7 +6,7 @@ import time
 from pathlib import Path
 from urllib.parse import quote
 
-from flask import Flask, abort, jsonify, render_template, send_file
+from flask import Flask, abort, jsonify, render_template, request, send_file
 
 IMAGE_EXTENSIONS = {
     ".apng",
@@ -32,17 +32,43 @@ class SlideshowState:
         self.current_index = 0
         self.delay_ms = 3000
         self.is_playing = False
+        self.delay_override = False
         self.last_error: str | None = None
         self.lock = threading.Lock()
         self.condition = threading.Condition(self.lock)
 
     def apply_config(self, images: list[dict[str, object]], delay_ms: int) -> None:
         with self.condition:
+            was_playing = self.is_playing
             self.images = images
             self.current_index = 0
-            self.delay_ms = delay_ms
-            self.is_playing = bool(images)
+            if not self.delay_override:
+                self.delay_ms = delay_ms
+            self.is_playing = was_playing and bool(images)
             self.last_error = None
+            self.condition.notify_all()
+
+    def set_delay(self, delay_ms: int) -> None:
+        with self.condition:
+            self.delay_ms = delay_ms
+            self.delay_override = True
+            self.condition.notify_all()
+
+    def start(self) -> None:
+        with self.condition:
+            if not self.images:
+                raise ValueError("No images loaded")
+            self.is_playing = True
+            self.condition.notify_all()
+
+    def stop(self) -> None:
+        with self.condition:
+            self.is_playing = False
+            self.condition.notify_all()
+
+    def reset(self) -> None:
+        with self.condition:
+            self.current_index = 0
             self.condition.notify_all()
 
     def set_error(self, message: str) -> None:
@@ -222,6 +248,44 @@ def viewer_alias() -> str:
 @app.get("/api/state")
 def api_state():
     return jsonify(serialize_state())
+
+
+@app.post("/api/set_delay")
+def api_set_delay():
+    payload = request.get_json(silent=True) or {}
+    delay_ms = payload.get("delay_ms")
+
+    try:
+        delay_ms_int = int(delay_ms)
+    except (TypeError, ValueError):
+        return jsonify({"error": "delay_ms must be an integer"}), 400
+
+    if delay_ms_int < MIN_DELAY_MS:
+        return jsonify({"error": f"delay_ms must be at least {MIN_DELAY_MS}"}), 400
+
+    state.set_delay(delay_ms_int)
+    return jsonify({"ok": True})
+
+
+@app.post("/api/start")
+def api_start():
+    try:
+        state.start()
+    except ValueError as exc:
+        return jsonify({"error": str(exc)}), 400
+    return jsonify({"ok": True})
+
+
+@app.post("/api/stop")
+def api_stop():
+    state.stop()
+    return jsonify({"ok": True})
+
+
+@app.post("/api/reset")
+def api_reset():
+    state.reset()
+    return jsonify({"ok": True})
 
 
 @app.get("/images/<int:index>/<path:filename>")
