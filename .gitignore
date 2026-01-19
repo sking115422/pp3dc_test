@@ -1,1 +1,4 @@
 test_imgs/
+.venv/
+test.zip
+.DS_Store
